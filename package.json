@@ -1,0 +1,26 @@
+{
+  "name": "infinite-vue-menu",
+  "author": "Maleesha Gimshan (https:/github.com/maleeshagimshan98)",
+  "version": "1.0.0",
+  "description": "Reusable menu component built with vue.js",
+  "license": "MIT",
+  "dependencies": {
+    "vue": "^3.2.41",
+    "vue3-click-away": "^1.2.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^3.2.0",
+    "vite": "^3.2.2",
+    "vue-template-compiler": "2.6.11"
+  },
+  "scripts": {
+    "dev": "vite serve"
+  },
+  "keywords": [
+    "vue",
+    "vue-component",
+    "sidebar",
+    "vue-sidebar",
+    "vue-sidebar-menu"
+  ]
+}
