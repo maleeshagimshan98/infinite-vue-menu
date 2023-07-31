@@ -5,7 +5,7 @@
 
 <template>
   <div
-    class="inf-vue-menu-menu"
+    class="inf-vue-menu"
     v-click-away="(event) => (clickaway ? close(event) : null)">
     <slot name="activator" :state="state"></slot>
     <!-- main content -->
@@ -19,7 +19,7 @@
           :key="item.key"
           :isActive="item.isActive"
           :children="item.children"
-          @sidemenu:isActive="(item) => itemClicked(item)">
+          @menu:isActive => itemClicked(item)">
         </MenuItem>
       </div>
     </slot>
@@ -52,10 +52,7 @@ export default {
   methods: {
     itemClicked(activeItem) {
       this.state.setActiveItem(activeItem) //... mark other items as inactive
-      if (this.closeWhenNavigating) {
-        this.$emit("update:isOpen", false)
-      }
-      this.$router.push({ name: path, params: activeItem.params })
+      //... call a callback 
     },
   },
   computed: {},
@@ -66,7 +63,7 @@ export default {
 </script>
 
 <style>
-.inf-vue-menu-menu {
+.inf-vue-menu {
   position: fixed;
   top: 0;
   bottom: 0;
@@ -74,7 +71,7 @@ export default {
   /** this side menu sits above the app bar */
 }
 
-.inf-vue-menu-menu .inf-vue-menu-content {
+.inf-vue-menu .inf-vue-menu-content {
   overflow-y: scroll;
   overflow-x: scroll;
 }
