@@ -6,20 +6,23 @@
 <template>
   <div
     class="inf-vue-menu"
-    v-click-away="(event) => (clickaway ? close(event) : null)">
-    <slot name="activator" :state="state"></slot>
+    v-click-away="(event) => (clickaway ? _state.closeMenu() : null)">
+    <slot name="activator" :state="_state"></slot>
     <!-- main content -->
     <!-- position absolute z-index-110 ? -->
-    <slot>
+    <slot v-if="_state.isMenuActive()">
       <div class="inf-vue-menu-content">
         <!-- make scrollable, hide scroll bar -->
         <MenuItem
-          v-for="(item, name, index) in state.getMenuItems()"
+          v-for="(item, name, index) in _state.getMenuItems()"
           :title="item.title"
-          :key="item.key"
+          :id="item.id"
           :isActive="item.isActive"
-          :children="item.children"
-          @menu:isActive => itemClicked(item)">
+          :children="item.getChildren()"
+          @menu:isActive="clicked => itemClicked(clicked)"
+          :closeOnClick="item.closeOnClick"
+          :styles="item.getStyles()"
+          >
         </MenuItem>
       </div>
     </slot>
@@ -28,13 +31,13 @@
 
 <script>
 import MenuItem from "./MenuItem.vue"
-import MenuState from "./js/MenuState.js"
+import MenuState from "./MenuState.js"
 
 export default {
   name: "infinite-vue-menu",
   data: function () {
     return {
-      state: new MenuState(this.items),
+      _state : null
     }
   },
   props: {
@@ -50,29 +53,38 @@ export default {
     },
   },
   methods: {
-    itemClicked(activeItem) {
-      this.state.setActiveItem(activeItem) //... mark other items as inactive
-      //... call a callback 
+    async itemClicked (id) {
+      let item = this._state.getMenuItems(id)
+      console.log(id)
+      console.log(item)
+      item.setActive(true)
+      this._state.setActiveItemState(item) //... mark other items as inactive
+      if (item.closeOnClick && !item.hasChildren()) {
+        this._state.toggleMenu()
+      }
+      if (typeof item.getCallback() === 'function') {
+        await item.getCallback()()
+      }
+
     },
   },
   computed: {},
   components: {
     MenuItem,
   },
+  beforeMount () {
+    this._state = new MenuState(this.items, this.styles)
+  },
 }
 </script>
 
 <style>
 .inf-vue-menu {
-  position: fixed;
-  top: 0;
-  bottom: 0;
+  position: relative;
   z-index: 120;
-  /** this side menu sits above the app bar */
 }
 
 .inf-vue-menu .inf-vue-menu-content {
-  overflow-y: scroll;
-  overflow-x: scroll;
+  position: absolute;
 }
 </style>
