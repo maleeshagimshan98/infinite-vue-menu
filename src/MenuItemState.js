@@ -11,73 +11,113 @@ class MenuItemState {
    *
    * @param {Object}
    */
-  constructor({
-    key,
-    title,
-    path,
-    routeName,
-    params,
-    isActive,
-    children,
-    styles,
-  }) {
-    if (!path && !routeName) {
-      console.error(`path or routeName is required. At ${title} || ${key}`)
-      throw new Error(`path or routeName is required.`)
+  constructor({ id, title, isActive, callback, closeOnClick, styles }) {
+    this._id = id
+    this._title = title
+    this._isActive = isActive
+
+    if (callback && typeof callback !== 'function') {
+      throw new Error(`Error in creating MenuItemState - callback must be a function but recieved ${callback}`)
     }
-    this.key = key
-    this.title = title ?? ""
-    this.path = path
-    this.routeName = routeName
-    this.params = params
-    this.isActive = isActive ?? false
-    this.children = children ?? {}
-    this.styles = new MenuStyles(
-      styles ??
-        {
-          //... pass default class names
-        }
-    )
+
+    this._callback = callback
+    this._closeOnClick = closeOnClick
+    this._children = {}
+    this._styles = styles
+  }
+
+  /**
+   * Getter method for retrieving the id.
+   *
+   * @returns {String} The id
+   */
+  get id() {
+    return this._id
+  }
+
+  /**
+   * Getter method for retrieving the title.
+   *
+   * @returns {String} The title
+   */
+  get title() {
+    return this._title
+  }
+
+  /**
+   * Getter method for retrieving the isActive status.
+   *
+   * @returns {Boolean} The isActive status
+   */
+  get isActive() {
+    return this._isActive
+  }
+
+  /**
+   * Getter method for retrieving the callback.
+   *
+   * @returns {Function} The callback
+   */
+  getCallback() {
+    return this._callback
+  }
+
+  /**
+   * Getter method for retrieving the callback.
+   *
+   * @returns {Boolean}
+   */
+  get closeOnClick () {
+    return this._closeOnClick
+  }
+
+  /**
+   * Check if the item has children
+   * 
+   * @returns {Boolean}
+   */
+  hasChildren () {
+    return Object.keys(this._children).length > 0
   }
 
   /**
    * get the children of this item
    *
-   * @returns {array|boolean} children
+   * @returns {Object} children
    */
   getChildren() {
-    return this.children
+    return this._children
   }
 
   /**
    * set childrens of this item
    *
    * @param {Object} children
-   * @returns
+   * @returns {MenuItemState}
    */
   setChildren(children) {
-    this.children = children
+    this._children = children
     return this
   }
 
   /**
    * get the style object
    *
-   * @returns {object} styles
+   * @returns {Object} styles
    */
   getStyles() {
-    return this.styles
+    return this._styles.getStyles()
   }
 
   /**
    * set styles,
    * if any of property is not set, set it to default
    *
-   *  @param {object} styles - style object
-   * @returns
+   * @param {Object} styles - style object
+   * @returns {MenuItemState}
    */
   setStyles(styles) {
-    this.styles = styles
+    this._styles = styles
     return this
   }
 
@@ -85,18 +125,11 @@ class MenuItemState {
    * Set the MenuItem as active
    *
    * @param {Boolean} status
-   * @returns {void}
+   * @returns {MenuItemState}
    */
   setActive(status) {
-    this.isActive = status
-  }
-
-  /**
-   *
-   */
-  getRouteLocationObj() {
-    if (this.path) {
-    }
+    this._isActive = status
+    return this
   }
 }
 
