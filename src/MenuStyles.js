@@ -1,5 +1,5 @@
 /**
- * © Maleesha Gimshan - 2021 - github.com/maleeshagimshan98
+ * © Maleesha Gimshan - 2023 - github.com/maleeshagimshan98
  * Menu styles
  */
 
@@ -11,9 +11,11 @@ class MenuStyles {
      * @param {Object}
      * @returns {MenuStyles} 
      */
-    constructor ({bgActive="", bgHover="", bgInactive="", textActive="", textHover="", textInactive="" ,font=""})
+    constructor (item, text)
     {
-        this.setStyles({bgActive, bgHover, bgInactive, textActive, textHover, textInactive, font})        
+        this._item = {}
+        this._text = {}
+        this.setStyles(item, text)        
     }
 
     /**
@@ -24,36 +26,28 @@ class MenuStyles {
     getStyles ()
     {
         return {
-            bgActive : this.bgActive,
-            bgHover : this.bgHover,
-            bgInactive : this.bgInactive,
-            textActive : this.textActive,
-            textHover : this.textHover,
-            textInactive : this.textInactive,
-            font : this.font,
-          }
+            item : this._item,
+            text : this._text
+        }
     }
 
     /**
      * set styles,
      * if any of property is not set, set it to default
      * 
-     * @param {string} bgActive
-     * @param {string} bgInactive
-     * @param {string} textActive 
-     * @param {string} textInactive 
-     * @param {string} font 
+     * @param {Object | null} item
+     * @param {Object | null} text
      * @returns {object} 
      */
-    setStyles ({bgActive,bgHover, bgInactive,textActive, textHover, textInactive,font})
-    {         
-        this.bgActive = bgActive
-        this.bgHover = bgHover
-        this.bgInactive = bgInactive
-        this.textActive = textActive
-        this.textHover = textHover
-        this.textInactive = textInactive
-        this.font = font
+    setStyles (item, text)
+    {
+        let defaultStyles =  {
+            idle : [],
+            active : [],
+            disable : [],
+        }
+        this._item = item ?? defaultStyles
+        this._text = text ?? defaultStyles
     }
 }
 
