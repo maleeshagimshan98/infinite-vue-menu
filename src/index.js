@@ -4,4 +4,4 @@ import MenuState from "./MenuState"
 import MenuItemState from "./MenuItemState"
 import MenuStyles from "./MenuStyles"
 
-export default {Menu, MenuItem, MenuState, MenuItemState, MenuStyles}
+export {Menu, MenuItem, MenuState, MenuItemState, MenuStyles}
