@@ -10,16 +10,24 @@ class MenuItemState {
    * constructor
    *
    * @param {Object}
+   * @throws {Error}
    */
-  constructor({ id, title, isActive, callback, closeOnClick, styles }) {
+  constructor({ id, title, isActive = false, callback, closeOnClick = true, styles }) {
+    if (!id) {
+      throw new Error(`MenuItemState constructor requires an 'id' parameter, but it is missing.`)
+    }
+    if (!title) {
+      throw new Error(`MenuItemState constructor requires an 'id' parameter, but it is missing.`)
+    }
+    if (callback && typeof callback !== "function") {
+      throw new Error(
+        `MenuItemState constructor requires the callback to be a function but recieved ${callback}`
+      )
+    }
+
     this._id = id
     this._title = title
     this._isActive = isActive
-
-    if (callback && typeof callback !== 'function') {
-      throw new Error(`Error in creating MenuItemState - callback must be a function but recieved ${callback}`)
-    }
-
     this._callback = callback
     this._closeOnClick = closeOnClick
     this._children = {}
@@ -49,7 +57,7 @@ class MenuItemState {
    *
    * @returns {Boolean} The isActive status
    */
-  get isActive() {
+  isActive() {
     return this._isActive
   }
 
@@ -67,21 +75,21 @@ class MenuItemState {
    *
    * @returns {Boolean}
    */
-  get closeOnClick () {
+  get closeOnClick() {
     return this._closeOnClick
   }
 
   /**
    * Check if the item has children
-   * 
+   *
    * @returns {Boolean}
    */
-  hasChildren () {
+  hasChildren() {
     return Object.keys(this._children).length > 0
   }
 
   /**
-   * get the children of this item
+   * Get the children of this item
    *
    * @returns {Object} children
    */
@@ -90,12 +98,17 @@ class MenuItemState {
   }
 
   /**
-   * set childrens of this item
+   * set children of this item
    *
    * @param {Object} children
    * @returns {MenuItemState}
    */
   setChildren(children) {
+    if (Object.keys(children).length <= 0) {
+      throw new Error(
+        `Error setting the children of ${this._id}. Parameter children must be an object with 1 or more key-value pairs`
+      )
+    }
     this._children = children
     return this
   }
@@ -117,18 +130,32 @@ class MenuItemState {
    * @returns {MenuItemState}
    */
   setStyles(styles) {
+    if (styles instanceof MenuStyles == false) {
+      throw new Error(
+        `Error setting the styles of ${this._id}. Parameter styles must be an object with 1 or more key-value pairs`
+      )
+    }
     this._styles = styles
     return this
   }
 
   /**
-   * Set the MenuItem as active
+   * Set the MenuItemState as active
    *
-   * @param {Boolean} status
    * @returns {MenuItemState}
    */
-  setActive(status) {
-    this._isActive = status
+  setActive() {
+    this._isActive = true
+    return this
+  }
+
+  /**
+   * Reest the component state to ide state (isActive = false)
+   *
+   * @returns {MenuItemState}
+   */
+  reset() {
+    this._isActive = false
     return this
   }
 }
