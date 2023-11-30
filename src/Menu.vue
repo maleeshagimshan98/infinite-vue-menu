@@ -6,7 +6,7 @@
 <template>
   <div
     class="inf-vue-menu"
-    v-click-away="(event) => (clickaway ? _state.closeMenu() : null)">
+    v-click-away="(event) => clickaway && _state.isMenuActive() ? _state.closeMenu() : null">
     <slot name="activator" :state="_state"></slot>
     <!-- main content -->
     <!-- position absolute z-index-110 ? -->
@@ -54,7 +54,7 @@ export default {
   },
   methods: {
     async itemClicked (id) {
-      let item = this._state.getMenuItems(id)
+      let item = this._state.getMenuItemsById(id)
       console.log(id)
       console.log(item)
       item.setActive(true)
