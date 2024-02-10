@@ -16,9 +16,9 @@ class MenuState {
    * @param {Object} items - items (menu item names),
    * @param {Object} styles (menu-wide styling data)
    */
-  constructor(items, {item, text}= {}) {
+  constructor(items, { item, text } = {}) {
     this._isMenuActive = false
-    this._styles = new MenuStyles(item??null,text??null)
+    this._styles = new MenuStyles(item ?? null, text ?? null)
     this._activeItem
     this._items = this._initialize(items)
   }
@@ -41,6 +41,7 @@ class MenuState {
         id: items[item].id,
         title: items[item].title ?? "",
         isActive: items[item].isActive ?? false,
+        disabled : items[item].disabled ?? false,
         callback: items[item].callback ?? null,
         closeOnClick: items[item].closeOnClick ?? true,
         styles: items[item].styles ?? this._styles,
@@ -83,6 +84,9 @@ class MenuState {
    * @returns {void}
    */
   _iterateOverStates(callback) {
+    if (Object.keys(this._items).length <= 0) {
+      console.warn(`Trying to iterate over children of ${this._id} but the item has no children`)
+    }
     for (let item in this._items) {
       callback(this._items[item])
     }
@@ -96,9 +100,11 @@ class MenuState {
    */
   setActiveItemState(menuState) {
     this._activeItem = menuState
-    //... mark other items as inactive
+    //... mark rest of the items as inactive
     this._iterateOverStates((item) => {
-      item.reset()
+      if (item.id !== menuState.id) {
+        item.reset()
+      }
     })
   }
 
