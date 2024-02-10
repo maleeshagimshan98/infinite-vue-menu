@@ -12,7 +12,7 @@ class MenuItemState {
    * @param {Object}
    * @throws {Error}
    */
-  constructor({ id, title, isActive = false, callback, closeOnClick = true, styles }) {
+  constructor({ id, title, isActive = false, disabled = false, callback, closeOnClick = true, styles }) {
     if (!id) {
       throw new Error(`MenuItemState constructor requires an 'id' parameter, but it is missing.`)
     }
@@ -25,9 +25,11 @@ class MenuItemState {
       )
     }
 
+    this._activeChildItem
     this._id = id
     this._title = title
     this._isActive = isActive
+    this._disabled = disabled
     this._callback = callback
     this._closeOnClick = closeOnClick
     this._children = {}
@@ -62,6 +64,24 @@ class MenuItemState {
   }
 
   /**
+   * Getter method for retrieving the disabled status
+   * 
+   * @returns {boolean}
+   */
+  isDisabled() {
+    return this._disabled
+  }
+
+  /**
+   * Set the disabled value to true
+   * 
+   * @return {void}
+   */
+  setDisabled () {
+    this._disabled = true
+  }
+
+  /**
    * Getter method for retrieving the callback.
    *
    * @returns {Function} The callback
@@ -71,7 +91,7 @@ class MenuItemState {
   }
 
   /**
-   * Getter method for retrieving the callback.
+   * Getter method for retrieving the closeOnClick status.
    *
    * @returns {Boolean}
    */
@@ -150,12 +170,48 @@ class MenuItemState {
   }
 
   /**
+   * Iterate over the MenuStateItems and call a callback function for each MenuItemState
+   *
+   * @param {Function} callback
+   * @returns {void}
+   */
+  _iterateOverChildStates(callback) {
+    if (Object.keys(this._children).length <= 0) {
+      console.warn(`Warning:Infinite-Vue-Menu - Trying to iterate over children of ${this._id} but the item has no children`)
+    }
+    for (let item in this._children) {
+      callback(this._children[item])
+    }
+  }
+
+  /**
+   * set active menu item
+   *
+   * @param {MenuItemState} childMenuState
+   * @returns {void}
+   */
+  setActiveChildItemState(childMenuState) {
+    this._activeChildItem = childMenuState
+    //... mark rest of the items as inactive
+    this._iterateOverChildStates((item) => {
+      if (item.id !== childMenuState.id) {
+        item.reset()
+      }
+    })
+  }
+
+  /**
    * Reest the component state to ide state (isActive = false)
    *
    * @returns {MenuItemState}
    */
   reset() {
     this._isActive = false
+    if (this.hasChildren()) {
+      this._iterateOverChildStates(child => {
+        child.reset()
+      })
+    }
     return this
   }
 }
