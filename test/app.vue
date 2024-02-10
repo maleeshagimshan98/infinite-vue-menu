@@ -1,6 +1,10 @@
 <template>
     <div class="app">
-        <app :items="items"></app>
+        <app :items="items">
+            <template #activator="{state}" >
+                <button class="" v-on:click="state.toggleMenu()"> menu </button>
+            </template>
+        </app>
     </div>
 </template>
 
@@ -11,25 +15,20 @@ export default {
     data() {
         let items = {
             home: {
-                routeName: "home"
+                id : 'home',
+                title : 'Home'                
             },
             profile: {
+                id : "profile",
                 title: 'User Profile',
-                path: "/profile",
                 children: {
                     edit: {
+                        id : 'edit',
                         title: "Edit profile",
-                        path: "/profile/edit",
-                        params: {
-                            userId: 1100,
-                            name: "test"
-                        },
                         children: {
                             deepChild: {
-                                path: "/profile/deep",
-                                params: {
-                                    deeep: "deeeeeep,  very deep"
-                                }
+                                id : 'deepchild',
+                                title : 'Deep Child'
                             }
                         }
                     }

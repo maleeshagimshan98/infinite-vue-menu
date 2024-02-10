@@ -4,8 +4,10 @@
 
 import { createApp } from "vue"
 import app from "./app.vue"
+import VueClickAwayPlugin from "vue3-click-away"
 
 const main = createApp(app)
+main.use(VueClickAwayPlugin)
 main.mount('#app')
 
 
