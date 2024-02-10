@@ -10,17 +10,14 @@
     <slot name="activator" :state="_state"></slot>
     <!-- main content -->
     <!-- position absolute z-index-110 ? -->
-    <slot v-if="_state.isMenuActive()">
+    <slot v-if="_state.isMenuActive()" :state="_state">
       <div class="inf-vue-menu-content">
         <!-- make scrollable, hide scroll bar -->
         <MenuItem
           v-for="(item, name, index) in _state.getMenuItems()"
-          :title="item.title"
-          :id="item.id"
-          :isActive="item.isActive"
-          :children="item.getChildren()"
-          @menu:isActive="clicked => itemClicked(clicked)"
-          :closeOnClick="item.closeOnClick"
+          :state="item"
+          @menu:isActive="id => itemClicked(item)"
+          @menu:toggle="toggleMenu()"
           :styles="item.getStyles()"
           >
         </MenuItem>
@@ -53,14 +50,16 @@ export default {
     },
   },
   methods: {
-    async itemClicked (id) {
-      let item = this._state.getMenuItemsById(id)
-      console.log(id)
+    toggleMenu () {
+      this._state.toggleMenu()
+    },
+    async itemClicked (item) {
+      //let item = this._state.getMenuItemsById(item)
       console.log(item)
-      item.setActive(true)
+      //... TODO - clashing with nested item logic
       this._state.setActiveItemState(item) //... mark other items as inactive
       if (item.closeOnClick && !item.hasChildren()) {
-        this._state.toggleMenu()
+        this.toggleMenu()
       }
       if (typeof item.getCallback() === 'function') {
         await item.getCallback()()

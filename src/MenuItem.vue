@@ -1,28 +1,17 @@
 /** * © Maleesha Gimshan - 2023 - github.com/maleeshagimshan98 * Menu item */
 
 <template>
-  <div
-    class=""
-    v-bind:class="itemStyles"
-    :key="id"
-    v-on:click="selected(id)">
+  <div class="" v-bind:class="itemStyles" :key="state.id" v-on:click="selected()">
     <!-- menu item content -->
     <slot>
       <p class="" v-bind:class="textStyles">
-        {{ title }}
+        {{ state.title }}
       </p>
 
       <!-- children -->
-      <div v-if="isActive && children">
-        <infinite-vue-menu-item
-          v-for="(child, name, index) in children"
-          :key="child.id"
-          :title="child.title"
-          :id="child.id"
-          :isActive="child.isActive"
-          :children="child.getChildren()"
-          :styles="child.getStyles()"
-          @menu:isActive="selected(child.id)">
+      <div v-if="state.isActive() && state.hasChildren()">
+        <infinite-vue-menu-item v-for="(child, name, index) in state.getChildren()" :state="child"
+          :styles="child.getStyles()" @menu:isActive="childSelected(child)" @menu:toggle="toggleByChildItem(child)">
         </infinite-vue-menu-item>
       </div>
     </slot>
@@ -33,62 +22,67 @@
 export default {
   name: "infinite-vue-menu-item",
   data: function () {
-    return {}
+    return {
+      isSelected: false,
+    }
   },
   computed: {
     itemStyles() {
       return {
-        [this.styles.item.idle.join(" ")]: !this.isActive,
-        [this.styles.item.active.join(" ")]: this.isActive,
-        [this.styles.item.disable.join(" ")]: this.disable,
+        [this.styles.item.idle.join(" ")]: !this.isSelected,
+        [this.styles.item.active.join(" ")]: this.isSelected,
+        [this.styles.item.disable.join(" ")]: this.state.isDisabled(),
       }
     },
     textStyles() {
       return {
-        [this.styles.text.idle.join(" ")]: !this.isActive,
-        [this.styles.text.active.join(" ")]: this.isActive,
-        [this.styles.text.disable.join(" ")]: this.disable,
+        [this.styles.text.idle.join(" ")]: !this.isSelected,
+        [this.styles.text.active.join(" ")]: this.isSelected,
+        [this.styles.text.disable.join(" ")]: this.state.isDisabled(),
       }
     },
   },
   props: {
-    closeOnClick: {
-      type: Boolean,
-      default: true,
-    },
-    title: {
-      type: String,
-      default: "",
-    },
-    id: {
-      type: [String, Number],
-    },
-    disable: {
-      type: Boolean,
-      default: false,
-    },
-    isActive: {
-      type: Boolean,
-      default: false,
-    },
-    children: {
+    state: {
       type: Object,
+      required: true
     },
     styles: {
       type: [Object],
     },
   },
   methods: {
-    selected(id) {
-      this.$emit("menu:isActive", id)
+    selected() {
+      this.isSelected = true
+      this.state.setActive()
+      this.$emit('menu:isActive', this.state.id)
+    },
+    toggleByChildItem() {
+      this.state.reset() 
+      console.log(this.state)
+      this.$emit('menu:toggle')
+    },
+    async childSelected(child) {
+      this.isSelected = false
+      child.setActiveChildItemState(child)
+      if (child.closeOnClick && !child.hasChildren()) {
+        this.toggleByChildItem()
+      }
+      if (typeof child.getCallback() === 'function') {
+        await child.getCallback()()
+      }
     },
   },
   beforeMount() {
-    if (this.disable && this.isActive) {
+    if (this.state.isDisabled() && this.state.isActive()) {
       throw new Error(
-        `Error in component MenuItem with ${this.id}. disable and isActive props cannot be true at the same time`
+        `Error in component MenuItem with ${this.state.id}. disable and isActive props cannot be true at the same time`
       )
     }
+  },
+  unmounted() {
+    //... TODO - reset all the child states
+    this.state.reset()
   },
 }
 </script>
