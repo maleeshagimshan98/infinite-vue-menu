@@ -1,7 +1,7 @@
 /** * © Maleesha Gimshan - 2023 - github.com/maleeshagimshan98 * Menu item */
 
 <template>
-  <div class="" v-bind:class="itemStyles" :key="state.id" v-on:click="selected()">
+  <div class="" v-bind:class="itemStyles" :key="state.id" v-on:click.stop="selected()">
     <!-- menu item content -->
     <slot>
       <p class="" v-bind:class="textStyles">
@@ -82,6 +82,7 @@ export default {
   },
   unmounted() {
     //... TODO - reset all the child states
+    this.isSelected = false
     this.state.reset()
   },
 }

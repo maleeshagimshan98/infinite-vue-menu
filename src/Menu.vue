@@ -64,7 +64,6 @@ export default {
       if (typeof item.getCallback() === 'function') {
         await item.getCallback()()
       }
-
     },
   },
   computed: {},
