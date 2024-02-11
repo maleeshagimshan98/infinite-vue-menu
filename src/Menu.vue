@@ -18,7 +18,6 @@
           :state="item"
           @menu:isActive="id => itemClicked(item)"
           @menu:toggle="toggleMenu()"
-          :styles="item.getStyles()"
           >
         </MenuItem>
       </div>
