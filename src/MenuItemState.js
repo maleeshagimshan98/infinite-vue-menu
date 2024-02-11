@@ -203,6 +203,10 @@ class MenuItemState {
    */
   setSelected () {
     this._isSelected = true
+    //... in case of child items are in active state, reset them
+    this._iterateOverChildStates((item) => {
+      item.reset()
+    })
     return this.setActive()
   }
 
