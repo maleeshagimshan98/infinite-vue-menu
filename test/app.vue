@@ -13,14 +13,18 @@ import app from "../src/Menu.vue"
 
 const styles = {
     item: {
+        base: ['base-item'],
         idle: ['item-idle'],
         active: ['item-active'],
-        disable: ['itemdisable'],
+        disable: ['item-disable'],
+        children: ['item-child'],
     },
     text: {
+        base: ['base-text'],
         idle: ['text-idle'],
         active: ['text-active'],
         disable: ['text-disable'],
+        children: ['text-child'],
     }
 }
 
@@ -29,7 +33,23 @@ export default {
         let items = {
             home: {
                 id: 'home',
-                title: 'Home'
+                title: 'Home',
+                styles: {
+                    item: {
+                        base: ['home-base'],
+                        //idle: ['home-item-idle'],
+                        active: ['home-item-active'],
+                        disable: ['home-item-disable'],
+                        children: ['home-item-child'],
+                    },
+                    text: {
+                        base: ['home-base'],
+                        idle: ['home-text-idle'],
+                        active: ['home-text-active'],
+                        disable: ['home-text-disable'],
+                        children: ['home-text-child'],
+                    }
+                },
             },
             profile: {
                 id: "profile",
@@ -54,7 +74,7 @@ export default {
             },
         }
         return {
-            styles : styles,
+            styles: styles,
             items: items
         }
     },
