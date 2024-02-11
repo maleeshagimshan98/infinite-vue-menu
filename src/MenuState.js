@@ -24,33 +24,50 @@ class MenuState {
   }
 
   /**
+   * Initialize the styles for a particular menu item
+   * 
+   * @param {object} item 
+   * @returns {MenuStyles}
+   */
+  _initializeItemStyles (item) {
+    if (!item.hasOwnProperty('styles')) {
+      return this._styles
+    }
+    return new MenuStyles(
+      item.styles.item ?? null,
+      item.styles.text
+    )
+  }
+
+  /**
    * initialize  menu items
    *
    * @param {Object} items
    * @returns {Object}
    */
-  _initialize(items) {
+  _initialize(items, isChild = false) {
     let stateTree = {}
-    for (let item in items) {
-      if (!items[item].id) {
+    Object.entries(items).forEach(([key, item]) => {
+      if (!item.id) {
         throw new Error(
-          `Error in creating a MenuItemState. No id is passed for MenuItem with title named '${items[item].title}'`
+          `Error in creating a MenuItemState. No id is passed for MenuItem with title named '${item.title}'`
         )
       }
       let menuItem = new MenuItemState({
-        id: items[item].id,
-        title: items[item].title ?? "",
-        isActive: items[item].isActive ?? false,
-        disabled : items[item].disabled ?? false,
-        callback: items[item].callback ?? null,
-        closeOnClick: items[item].closeOnClick ?? true,
-        styles: items[item].styles ?? this._styles,
+        id: item.id,
+        title: item.title ?? "",
+        isChild : isChild,
+        isActive: item.isActive ?? false,
+        disabled : item.disabled ?? false,
+        callback: item.callback ?? null,
+        closeOnClick: item.closeOnClick ?? true,
+        styles: this._initializeItemStyles(item),
       })
-      if (items[item].children) {
-        menuItem.setChildren(this._initialize(items[item].children))
+      if (item.children) {
+        menuItem.setChildren(this._initialize(item.children, true))
       }
       stateTree[menuItem.id] = menuItem
-    }
+    })
     return stateTree
   }
 

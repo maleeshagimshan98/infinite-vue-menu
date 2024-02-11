@@ -11,16 +11,8 @@ class MenuStyles {
    * @returns {MenuStyles}
    */
   constructor(item, text) {
-    this._item = {
-      idle: [],
-      active: [],
-      disable: [],
-    }
-    this._text = {
-      idle: [],
-      active: [],
-      disable: [],
-    }
+    this._item = {}
+    this._text = {}
     if (item || text ) {
       this.setStyles(item, text)
     }
@@ -48,9 +40,11 @@ class MenuStyles {
    */
   _setDefaultStyles() {
     let defaultStyles = {
+      base : [], //... styles that do not change based on the component state eg- position, 
       idle: [],
       active: [],
       disable: [],
+      children : [],
     }
     this._item = defaultStyles
     this._text = defaultStyles
@@ -64,7 +58,7 @@ class MenuStyles {
    */
   _assignStyleValues (styles) {
     let element = {}
-    let state = ['idle', 'active', 'disable']
+    let state = ['base','idle', 'active', 'disable', 'children']
     state.forEach (el => {
         if (!styles.hasOwnProperty(el)) {
         console.warn(`Infinite-Vue-Menu : Warning - Cannot set the styles. Styles object does not have a property ${el}`)

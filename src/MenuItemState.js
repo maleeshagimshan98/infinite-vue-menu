@@ -12,7 +12,7 @@ class MenuItemState {
    * @param {Object}
    * @throws {Error}
    */
-  constructor({ id, title, isActive = false, disabled = false, callback, closeOnClick = true, styles }) {
+  constructor({ id, title, isChild = false, isActive = false, disabled = false, callback, closeOnClick = true, styles }) {
     if (!id) {
       throw new Error(`MenuItemState constructor requires an 'id' parameter, but it is missing.`)
     }
@@ -28,6 +28,7 @@ class MenuItemState {
     this._activeChildItem
     this._id = id
     this._title = title
+    this._isChild = isChild
     this._isActive = isActive
     this._disabled = disabled
     this._callback = callback
@@ -52,6 +53,15 @@ class MenuItemState {
    */
   get title() {
     return this._title
+  }
+
+  /**
+   * Getter method for checking if the menu item is a child of a parent maenu item
+   * 
+   * @returns {boolean}
+   */
+  isChild() {
+    return this._isChild
   }
 
   /**

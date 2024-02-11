@@ -28,17 +28,23 @@ export default {
   },
   computed: {
     itemStyles() {
+      let {item} = this.state.getStyles()
       return {
-        [this.styles.item.idle.join(" ")]: !this.isSelected,
-        [this.styles.item.active.join(" ")]: this.isSelected,
-        [this.styles.item.disable.join(" ")]: this.state.isDisabled(),
+        [item.base.join(" ")] : true,
+        [item.idle.join(" ")]: !this.isSelected && !this.state.isDisabled(),
+        [item.active.join(" ")]: this.isSelected,
+        [item.disable.join(" ")]: this.state.isDisabled(),
+        [item.children.join(" ")] : this.state.isChild(),
       }
     },
     textStyles() {
+      let {text} = this.state.getStyles()
       return {
-        [this.styles.text.idle.join(" ")]: !this.isSelected,
-        [this.styles.text.active.join(" ")]: this.isSelected,
-        [this.styles.text.disable.join(" ")]: this.state.isDisabled(),
+        [text.base.join(" ")] : true,
+        [text.idle.join(" ")]: !this.isSelected && !this.state.isDisabled(),
+        [text.active.join(" ")]: this.isSelected,
+        [text.disable.join(" ")]: this.state.isDisabled(),
+        [text.children.join(" ")] : this.state.isChild(),
       }
     },
   },
@@ -53,6 +59,9 @@ export default {
   },
   methods: {
     selected() {
+      if (this.state.isDisabled()) {
+        return //...
+      }
       this.isSelected = true
       this.state.setActive()
       this.$emit('menu:isActive', this.state.id)
@@ -63,6 +72,9 @@ export default {
       this.$emit('menu:toggle')
     },
     async childSelected(child) {
+      if (this.state.isDisabled()) {
+        return //...
+      }
       this.isSelected = false
       child.setActiveChildItemState(child)
       if (child.closeOnClick && !child.hasChildren()) {
