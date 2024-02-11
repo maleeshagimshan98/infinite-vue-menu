@@ -21,7 +21,12 @@ class MenuStyles {
       active: [],
       disable: [],
     }
-    this._setDefaultStyles()
+    if (item || text ) {
+      this.setStyles(item, text)
+    }
+    else {
+      this._setDefaultStyles()
+    }
   }
 
   /**
@@ -59,7 +64,8 @@ class MenuStyles {
    */
   _assignStyleValues (styles) {
     let element = {}
-    ['idle', 'active', 'disable'].forEach (el => {
+    let state = ['idle', 'active', 'disable']
+    state.forEach (el => {
         if (!styles.hasOwnProperty(el)) {
         console.warn(`Infinite-Vue-Menu : Warning - Cannot set the styles. Styles object does not have a property ${el}`)
         }
