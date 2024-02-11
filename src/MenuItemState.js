@@ -12,7 +12,7 @@ class MenuItemState {
    * @param {Object}
    * @throws {Error}
    */
-  constructor({ id, title, isChild = false, isActive = false, disabled = false, callback, closeOnClick = true, styles }) {
+  constructor({ id, title, isChild = false, isSelected = false, isActive = false, disabled = false, callback, closeOnClick = true, styles }) {
     if (!id) {
       throw new Error(`MenuItemState constructor requires an 'id' parameter, but it is missing.`)
     }
@@ -29,6 +29,7 @@ class MenuItemState {
     this._id = id
     this._title = title
     this._isChild = isChild
+    this._isSelected = isSelected
     this._isActive = isActive
     this._disabled = disabled
     this._callback = callback
@@ -71,6 +72,22 @@ class MenuItemState {
    */
   isActive() {
     return this._isActive
+  }
+
+  /**
+   * Getter method for retrieving the isSelected status.
+   * 
+   * @returns {Boolean}
+   */
+  isSelected () {
+    return this._isSelected
+  }
+
+  /**
+   * 
+   */
+  unselect () {
+    this._isSelected = false
   }
 
   /**
@@ -180,6 +197,16 @@ class MenuItemState {
   }
 
   /**
+   * Set the MenuItemState as selected and active
+   * 
+   * @return {MenuItemState}
+   */
+  setSelected () {
+    this._isSelected = true
+    return this.setActive()
+  }
+
+  /**
    * Iterate over the MenuStateItems and call a callback function for each MenuItemState
    *
    * @param {Function} callback
@@ -217,6 +244,7 @@ class MenuItemState {
    */
   reset() {
     this._isActive = false
+    this._isSelected = false
     if (this.hasChildren()) {
       this._iterateOverChildStates(child => {
         child.reset()

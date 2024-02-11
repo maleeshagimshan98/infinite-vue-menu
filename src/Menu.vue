@@ -4,21 +4,15 @@
  */
 
 <template>
-  <div
-    class="inf-vue-menu"
-    v-click-away="(event) => clickaway && _state.isMenuActive() ? _state.closeMenu() : null">
+  <div class="inf-vue-menu" v-click-away="(event) => clickaway && _state.isMenuActive() ? _state.closeMenu() : null">
     <slot name="activator" :state="_state"></slot>
     <!-- main content -->
     <!-- position absolute z-index-110 ? -->
     <slot v-if="_state.isMenuActive()" :state="_state">
       <div class="inf-vue-menu-content">
         <!-- make scrollable, hide scroll bar -->
-        <MenuItem
-          v-for="(item, name, index) in _state.getMenuItems()"
-          :state="item"
-          @menu:isActive="id => itemClicked(item)"
-          @menu:toggle="toggleMenu()"
-          >
+        <MenuItem v-for="(item, name, index) in _state.getMenuItems()" :state="item"
+          @menu:isActive="id => itemClicked(item)" @menu:toggle="toggleMenu()">
         </MenuItem>
       </div>
     </slot>
@@ -33,13 +27,17 @@ export default {
   name: "infinite-vue-menu",
   data: function () {
     return {
-      _state : null
+      _state: null
     }
   },
   props: {
-    clickaway : {
-        type : Boolean,
-        default : true
+    clickaway: {
+      type: Boolean,
+      default: true
+    },
+    activated: {
+      type: Boolean,
+      default: false,
     },
     items: {
       type: Object,
@@ -49,10 +47,10 @@ export default {
     },
   },
   methods: {
-    toggleMenu () {
+    toggleMenu() {
       this._state.toggleMenu()
     },
-    async itemClicked (item) {
+    async itemClicked(item) {
       //let item = this._state.getMenuItemsById(item)
       console.log(item)
       //... TODO - clashing with nested item logic
@@ -69,8 +67,13 @@ export default {
   components: {
     MenuItem,
   },
-  beforeMount () {
+  beforeMount() {
     this._state = new MenuState(this.items, this.styles)
+  },
+  mounted() {
+    if (this.activated) {
+      this._state.toggleMenu()
+    }
   },
 }
 </script>

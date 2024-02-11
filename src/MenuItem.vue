@@ -23,7 +23,6 @@ export default {
   name: "infinite-vue-menu-item",
   data: function () {
     return {
-      isSelected: false,
     }
   },
   computed: {
@@ -31,8 +30,8 @@ export default {
       let {item} = this.state.getStyles()
       return {
         [item.base.join(" ")] : true,
-        [item.idle.join(" ")]: !this.isSelected && !this.state.isDisabled(),
-        [item.active.join(" ")]: this.isSelected,
+        [item.idle.join(" ")]: !this.state.isSelected() && !this.state.isDisabled(),
+        [item.active.join(" ")]: this.state.isSelected(),
         [item.disable.join(" ")]: this.state.isDisabled(),
         [item.children.join(" ")] : this.state.isChild(),
       }
@@ -41,8 +40,8 @@ export default {
       let {text} = this.state.getStyles()
       return {
         [text.base.join(" ")] : true,
-        [text.idle.join(" ")]: !this.isSelected && !this.state.isDisabled(),
-        [text.active.join(" ")]: this.isSelected,
+        [text.idle.join(" ")]: !this.state.isSelected() && !this.state.isDisabled(),
+        [text.active.join(" ")]: this.state.isSelected(),
         [text.disable.join(" ")]: this.state.isDisabled(),
         [text.children.join(" ")] : this.state.isChild(),
       }
@@ -61,9 +60,8 @@ export default {
     selected() {
       if (this.state.isDisabled()) {
         return //...
-      }
-      this.isSelected = true
-      this.state.setActive()
+      }      
+      this.state.setSelected()
       this.$emit('menu:isActive', this.state.id)
     },
     toggleByChildItem() {
@@ -75,7 +73,7 @@ export default {
       if (this.state.isDisabled()) {
         return //...
       }
-      this.isSelected = false
+      this.state.unselect()
       child.setActiveChildItemState(child)
       if (child.closeOnClick && !child.hasChildren()) {
         this.toggleByChildItem()
@@ -94,7 +92,6 @@ export default {
   },
   unmounted() {
     //... TODO - reset all the child states
-    this.isSelected = false
     this.state.reset()
   },
 }
