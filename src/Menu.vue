@@ -31,6 +31,10 @@ export default {
     }
   },
   props: {
+    closeOnClick : {
+      type : Boolean,
+      default : false
+    },
     clickaway: {
       type: Boolean,
       default: true
@@ -55,7 +59,7 @@ export default {
       console.log(item)
       //... TODO - clashing with nested item logic
       this._state.setActiveItemState(item) //... mark other items as inactive
-      if (item.closeOnClick && !item.hasChildren()) {
+      if (this.closeOnClick && !item.hasChildren()) {
         this.toggleMenu()
       }
       if (typeof item.getCallback() === 'function') {

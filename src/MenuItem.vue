@@ -60,7 +60,12 @@ export default {
     selected() {
       if (this.state.isDisabled()) {
         return //...
-      }      
+      }
+      //... toggle the child menu if already the menu item is active
+      if (this.state.isActive() && this.state.hasChildren()) {
+        this.state.reset()
+        return
+      }
       this.state.setSelected()
       this.$emit('menu:isActive', this.state.id)
     },
