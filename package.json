@@ -1,8 +1,9 @@
 {
   "name": "infinite-vue-menu",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Reusable menu component built with vue.js",
   "license": "MIT",
+  "main": "src/index.js",
   "dependencies": {
     "vue": "^3.2.41",
     "vue3-click-away": "^1.2.4"
