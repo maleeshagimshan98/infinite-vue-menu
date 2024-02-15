@@ -84,7 +84,10 @@ export default {
         this.toggleByChildItem()
       }
       if (typeof child.getCallback() === 'function') {
-        await child.getCallback()()
+        await child.getCallback()({
+          router : this.$router,
+          store : this.$store
+        })
       }
     },
   },

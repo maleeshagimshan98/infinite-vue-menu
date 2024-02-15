@@ -63,7 +63,10 @@ export default {
         this.toggleMenu()
       }
       if (typeof item.getCallback() === 'function') {
-        await item.getCallback()()
+        await item.getCallback()({
+          router : this.$router,
+          store : this.$store
+        })
       }
     },
   },

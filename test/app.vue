@@ -1,6 +1,6 @@
 <template>
     <div class="app">
-        <app :items="items" :styles="styles">
+        <app :closeOnClick="false" :items="items" :styles="styles">
             <template #activator="{ state }">
                 <button class="" v-on:click="state.toggleMenu()"> menu </button>
             </template>
@@ -70,7 +70,11 @@ export default {
             settings: {
                 id: 'settings',
                 title: 'Settings',
-                closeOnClick: false
+                closeOnClick: false,
+                callback : async ({router, store}) => {
+                    console.log(router)
+                    console.log(store)
+                }
             },
         }
         return {
@@ -78,7 +82,11 @@ export default {
             items: items
         }
     },
-    methods: {},
+    methods: {
+        testSlotProps (state) {
+            console.log(state)
+        },
+    },
     components: {
         app
     }
