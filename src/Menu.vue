@@ -11,9 +11,9 @@
     <slot v-if="state.isMenuActive()">
       <div class="inf-vue-menu-content">
         <!-- make scrollable, hide scroll bar -->
-        <MenuItem v-for="(item, name, index) in state.getMenuItems()" :state="item"
-          @menu:isActive="id => itemClicked(item)" @menu:toggle="toggleMenu()"
-          @mouseover.stop="activateChildOnMouseOver(item)" @mouseout="resetOnMouseLeave(item)">
+        <MenuItem v-for="(item, name, index) in state.getMenuItems()" :activateOnHover="activateOnHover" :state="item"
+          @menu:isActive="id => activateItem(item)" @menu:toggle="toggleMenu()"
+          @menu:mouseover="activateOnMouseOver(item)">
         </MenuItem>
       </div>
     </slot>
@@ -44,7 +44,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    activateChildOnHover: {
+    activateOnHover: {
       type: Boolean,
       default: false
     },
@@ -57,24 +57,21 @@ export default {
     toggleMenu() {
       this.state.toggleMenu()
     },
-    async activateChildOnMouseOver(item) {
-      if (this.activateChildOnHover && item.hasChildren()) {
+    async activateOnMouseOver(item) {
+      if (this.activateOnHover) {
         this.state.setActiveItemState(item)
       }
-    },
-    resetOnMouseLeave() {
-      console.log('mouseout')
-    },
-    async itemClicked(item) {
+    },   
+    async activateItem(item) {
       //let item = this._state.getMenuItemsById(item)
-      console.log(item)
+      //console.log(item)
       this.state.setActiveItemState(item) //... mark other items as inactive
-      if (this.closeOnClick && !item.hasChildren()) {
-        this.toggleMenu()
-      }
       if (typeof item.getCallback() === 'function') {
         await item.getCallback()()
       }
+      if (this.closeOnClick && !item.hasChildren()) {
+        this.toggleMenu()
+      }      
     },
   },
   computed: {},

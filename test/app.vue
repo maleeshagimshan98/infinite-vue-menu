@@ -1,6 +1,6 @@
 <template>
     <div class="app">
-        <Menu :closeOnClick="false" :state="state" :activateChildOnHover="true">
+        <Menu :closeOnClick="false" :state="state" :activateOnHover="true">
             <template #activator>
                 <button class="" v-on:click="state.toggleMenu()"> menu </button>
             </template>

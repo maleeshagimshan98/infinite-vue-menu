@@ -1,7 +1,7 @@
 /** * © Maleesha Gimshan - 2023 - github.com/maleeshagimshan98 * Menu item */
 
 <template>
-  <div class="" v-bind:class="itemStyles" :key="state.id" v-on:mouseover="activateChildOnMouseOver(state)"
+  <div class="" v-bind:class="itemStyles" :key="state.id" v-on:mouseover="activateOnMouseOver()"
     v-on:click.stop="selected()">
     <!-- menu item content -->
     <slot>
@@ -11,9 +11,9 @@
 
       <!-- children -->
       <div style="display: flex; flex-direction : column;" v-if="state.isActive() && state.hasChildren()">
-        <infinite-vue-menu-item v-for="(child, name, index) in state.getChildren()" :state="child"
-          :styles="child.getStyles()" @menu:isActive="childSelected(child)" @menu:toggle="toggleByChildItem(child)"
-          @mouseover.stop="activateChildOnMouseOver(child)">
+        <infinite-vue-menu-item v-for="(child, name, index) in state.getChildren()" :activateOnHover="activateOnHover"
+          :state="child" :styles="child.getStyles()" @menu:isActive="childSelected(child)"
+          @menu:toggle="toggleByChildItem(child)" @mouseover.stop="activateChildOnMouseOver(child)">
         </infinite-vue-menu-item>
       </div>
     </slot>
@@ -50,6 +50,10 @@ export default {
     },
   },
   props: {
+    activateOnHover: {
+      type: Boolean,
+      default: false
+    },
     state: {
       type: Object,
       required: true
@@ -59,14 +63,19 @@ export default {
     },
   },
   methods: {
-    activateChildOnMouseOver(state) {
-      if (state.isDisabled()) {
+    activateOnMouseOver() {
+      if (this.state.isDisabled() || !this.activateOnHover) {
         return //...
       }
-      if (state.hasChildren()) {
-        state.setSelected()
-        this.$emit('menu:isActive')
+      this.state.setSelected()
+      this.$emit('menu:mouseover')
+    },
+    activateChildOnMouseOver(child) {
+      if (this.state.isDisabled()) {
+        return //...
       }
+      this.state.unselect()
+      child.setActiveChildItemState(child)
     },
     selected() {
       if (this.state.isDisabled()) {
@@ -82,7 +91,7 @@ export default {
     },
     toggleByChildItem() {
       this.state.reset()
-      console.log(this.state)
+      //console.log(this.state)
       this.$emit('menu:toggle')
     },
     async childSelected(child) {
@@ -95,10 +104,7 @@ export default {
         this.toggleByChildItem()
       }
       if (typeof child.getCallback() === 'function') {
-        await child.getCallback()({
-          router: this.$router,
-          store: this.$store
-        })
+        await child.getCallback()()
       }
     },
   },
