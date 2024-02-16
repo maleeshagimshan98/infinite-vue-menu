@@ -12,8 +12,8 @@
       <div class="inf-vue-menu-content">
         <!-- make scrollable, hide scroll bar -->
         <MenuItem v-for="(item, name, index) in state.getMenuItems()" :state="item"
-          @menu:isActive="id => itemClicked(item)" @menu:toggle="toggleMenu()" @mouseover.stop="activateChildOnMouseOver(item)"
-          @mouseout="resetOnMouseLeave(item)">
+          @menu:isActive="id => itemClicked(item)" @menu:toggle="toggleMenu()"
+          @mouseover.stop="activateChildOnMouseOver(item)" @mouseout="resetOnMouseLeave(item)">
         </MenuItem>
       </div>
     </slot>
@@ -62,7 +62,7 @@ export default {
         this.state.setActiveItemState(item)
       }
     },
-    resetOnMouseLeave () {
+    resetOnMouseLeave() {
       console.log('mouseout')
     },
     async itemClicked(item) {
@@ -73,10 +73,7 @@ export default {
         this.toggleMenu()
       }
       if (typeof item.getCallback() === 'function') {
-        await item.getCallback()({
-          router() { return this.$router },
-          store() { return this.$store }
-        })
+        await item.getCallback()()
       }
     },
   },
