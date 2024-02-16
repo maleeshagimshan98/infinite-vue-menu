@@ -1,15 +1,15 @@
 <template>
     <div class="app">
-        <app :closeOnClick="false" :items="items" :styles="styles">
-            <template #activator="{ state }">
+        <Menu :closeOnClick="false" :state="state" :activateChildOnHover="true">
+            <template #activator>
                 <button class="" v-on:click="state.toggleMenu()"> menu </button>
             </template>
-        </app>
+        </Menu>
     </div>
 </template>
 
 <script>
-import app from "../src/Menu.vue"
+import {Menu, MenuState} from "../src/index.js"
 
 const styles = {
     item: {
@@ -78,8 +78,7 @@ export default {
             },
         }
         return {
-            styles: styles,
-            items: items
+            state : new MenuState(items,styles)
         }
     },
     methods: {
@@ -88,7 +87,7 @@ export default {
         },
     },
     components: {
-        app
+        Menu
     }
 }
 </script>

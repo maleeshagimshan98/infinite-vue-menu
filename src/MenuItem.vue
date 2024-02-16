@@ -1,7 +1,8 @@
 /** * © Maleesha Gimshan - 2023 - github.com/maleeshagimshan98 * Menu item */
 
 <template>
-  <div class="" v-bind:class="itemStyles" :key="state.id" v-on:click.stop="selected()">
+  <div class="" v-bind:class="itemStyles" :key="state.id" v-on:mouseover="activateChildOnMouseOver(state)"
+    v-on:click.stop="selected()">
     <!-- menu item content -->
     <slot>
       <p class="" v-bind:class="textStyles">
@@ -11,7 +12,8 @@
       <!-- children -->
       <div style="display: flex; flex-direction : column;" v-if="state.isActive() && state.hasChildren()">
         <infinite-vue-menu-item v-for="(child, name, index) in state.getChildren()" :state="child"
-          :styles="child.getStyles()" @menu:isActive="childSelected(child)" @menu:toggle="toggleByChildItem(child)">
+          :styles="child.getStyles()" @menu:isActive="childSelected(child)" @menu:toggle="toggleByChildItem(child)"
+          @mouseover.stop="activateChildOnMouseOver(child)">
         </infinite-vue-menu-item>
       </div>
     </slot>
@@ -27,23 +29,23 @@ export default {
   },
   computed: {
     itemStyles() {
-      let {item} = this.state.getStyles()
+      let { item } = this.state.getStyles()
       return {
-        [item.base.join(" ")] : true,
+        [item.base.join(" ")]: true,
         [item.idle.join(" ")]: !this.state.isSelected() && !this.state.isDisabled(),
         [item.active.join(" ")]: this.state.isSelected(),
         [item.disable.join(" ")]: this.state.isDisabled(),
-        [item.children.join(" ")] : this.state.isChild(),
+        [item.children.join(" ")]: this.state.isChild(),
       }
     },
     textStyles() {
-      let {text} = this.state.getStyles()
+      let { text } = this.state.getStyles()
       return {
-        [text.base.join(" ")] : true,
+        [text.base.join(" ")]: true,
         [text.idle.join(" ")]: !this.state.isSelected() && !this.state.isDisabled(),
         [text.active.join(" ")]: this.state.isSelected(),
         [text.disable.join(" ")]: this.state.isDisabled(),
-        [text.children.join(" ")] : this.state.isChild(),
+        [text.children.join(" ")]: this.state.isChild(),
       }
     },
   },
@@ -57,6 +59,15 @@ export default {
     },
   },
   methods: {
+    activateChildOnMouseOver(state) {
+      if (state.isDisabled()) {
+        return //...
+      }
+      if (state.hasChildren()) {
+        state.setSelected()
+        this.$emit('menu:isActive')
+      }
+    },
     selected() {
       if (this.state.isDisabled()) {
         return //...
@@ -67,10 +78,10 @@ export default {
         return
       }
       this.state.setSelected()
-      this.$emit('menu:isActive', this.state.id)
+      this.$emit('menu:isActive')
     },
     toggleByChildItem() {
-      this.state.reset() 
+      this.state.reset()
       console.log(this.state)
       this.$emit('menu:toggle')
     },
@@ -85,8 +96,8 @@ export default {
       }
       if (typeof child.getCallback() === 'function') {
         await child.getCallback()({
-          router : this.$router,
-          store : this.$store
+          router: this.$router,
+          store: this.$store
         })
       }
     },
