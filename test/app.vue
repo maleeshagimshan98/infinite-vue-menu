@@ -1,48 +1,93 @@
 <template>
     <div class="app">
-        <app :items="items"></app>
+        <Menu :closeOnClick="false" :state="state" :activateChildOnHover="true">
+            <template #activator>
+                <button class="" v-on:click="state.toggleMenu()"> menu </button>
+            </template>
+        </Menu>
     </div>
 </template>
 
 <script>
-import app from "../src/Menu.vue"
+import {Menu, MenuState} from "../src/index.js"
+
+const styles = {
+    item: {
+        base: ['base-item'],
+        idle: ['item-idle'],
+        active: ['item-active'],
+        disable: ['item-disable'],
+        children: ['item-child'],
+    },
+    text: {
+        base: ['base-text'],
+        idle: ['text-idle'],
+        active: ['text-active'],
+        disable: ['text-disable'],
+        children: ['text-child'],
+    }
+}
 
 export default {
     data() {
         let items = {
             home: {
-                routeName: "home"
+                id: 'home',
+                title: 'Home',
+                styles: {
+                    item: {
+                        base: ['home-base'],
+                        //idle: ['home-item-idle'],
+                        active: ['home-item-active'],
+                        disable: ['home-item-disable'],
+                        children: ['home-item-child'],
+                    },
+                    text: {
+                        base: ['home-base'],
+                        idle: ['home-text-idle'],
+                        active: ['home-text-active'],
+                        disable: ['home-text-disable'],
+                        children: ['home-text-child'],
+                    }
+                },
             },
             profile: {
+                id: "profile",
                 title: 'User Profile',
-                path: "/profile",
                 children: {
                     edit: {
+                        id: 'edit',
                         title: "Edit profile",
-                        path: "/profile/edit",
-                        params: {
-                            userId: 1100,
-                            name: "test"
-                        },
                         children: {
                             deepChild: {
-                                path: "/profile/deep",
-                                params: {
-                                    deeep: "deeeeeep,  very deep"
-                                }
+                                id: 'deepchild',
+                                title: 'Deep Child'
                             }
                         }
                     }
                 }
-            }
+            },
+            settings: {
+                id: 'settings',
+                title: 'Settings',
+                closeOnClick: false,
+                callback : async ({router, store}) => {
+                    console.log(router)
+                    console.log(store)
+                }
+            },
         }
         return {
-            items: items
+            state : new MenuState(items,styles)
         }
     },
-    methods: {},
+    methods: {
+        testSlotProps (state) {
+            console.log(state)
+        },
+    },
     components: {
-        app
+        Menu
     }
 }
 </script>

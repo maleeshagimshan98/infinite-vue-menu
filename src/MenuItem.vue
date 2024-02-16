@@ -1,28 +1,19 @@
 /** * © Maleesha Gimshan - 2023 - github.com/maleeshagimshan98 * Menu item */
 
 <template>
-  <div
-    class=""
-    v-bind:class="itemStyles"
-    :key="id"
-    v-on:click="selected(id)">
+  <div class="" v-bind:class="itemStyles" :key="state.id" v-on:mouseover="activateChildOnMouseOver(state)"
+    v-on:click.stop="selected()">
     <!-- menu item content -->
     <slot>
       <p class="" v-bind:class="textStyles">
-        {{ title }}
+        {{ state.title }}
       </p>
 
       <!-- children -->
-      <div v-if="isActive && children">
-        <infinite-vue-menu-item
-          v-for="(child, name, index) in children"
-          :key="child.id"
-          :title="child.title"
-          :id="child.id"
-          :isActive="child.isActive"
-          :children="child.getChildren()"
-          :styles="child.getStyles()"
-          @menu:isActive="selected(child.id)">
+      <div style="display: flex; flex-direction : column;" v-if="state.isActive() && state.hasChildren()">
+        <infinite-vue-menu-item v-for="(child, name, index) in state.getChildren()" :state="child"
+          :styles="child.getStyles()" @menu:isActive="childSelected(child)" @menu:toggle="toggleByChildItem(child)"
+          @mouseover.stop="activateChildOnMouseOver(child)">
         </infinite-vue-menu-item>
       </div>
     </slot>
@@ -33,62 +24,94 @@
 export default {
   name: "infinite-vue-menu-item",
   data: function () {
-    return {}
+    return {
+    }
   },
   computed: {
     itemStyles() {
+      let { item } = this.state.getStyles()
       return {
-        [this.styles.item.idle.join(" ")]: !this.isActive,
-        [this.styles.item.active.join(" ")]: this.isActive,
-        [this.styles.item.disable.join(" ")]: this.disable,
+        [item.base.join(" ")]: true,
+        [item.idle.join(" ")]: !this.state.isSelected() && !this.state.isDisabled(),
+        [item.active.join(" ")]: this.state.isSelected(),
+        [item.disable.join(" ")]: this.state.isDisabled(),
+        [item.children.join(" ")]: this.state.isChild(),
       }
     },
     textStyles() {
+      let { text } = this.state.getStyles()
       return {
-        [this.styles.text.idle.join(" ")]: !this.isActive,
-        [this.styles.text.active.join(" ")]: this.isActive,
-        [this.styles.text.disable.join(" ")]: this.disable,
+        [text.base.join(" ")]: true,
+        [text.idle.join(" ")]: !this.state.isSelected() && !this.state.isDisabled(),
+        [text.active.join(" ")]: this.state.isSelected(),
+        [text.disable.join(" ")]: this.state.isDisabled(),
+        [text.children.join(" ")]: this.state.isChild(),
       }
     },
   },
   props: {
-    closeOnClick: {
-      type: Boolean,
-      default: true,
-    },
-    title: {
-      type: String,
-      default: "",
-    },
-    id: {
-      type: [String, Number],
-    },
-    disable: {
-      type: Boolean,
-      default: false,
-    },
-    isActive: {
-      type: Boolean,
-      default: false,
-    },
-    children: {
+    state: {
       type: Object,
+      required: true
     },
     styles: {
       type: [Object],
     },
   },
   methods: {
-    selected(id) {
-      this.$emit("menu:isActive", id)
+    activateChildOnMouseOver(state) {
+      if (state.isDisabled()) {
+        return //...
+      }
+      if (state.hasChildren()) {
+        state.setSelected()
+        this.$emit('menu:isActive')
+      }
+    },
+    selected() {
+      if (this.state.isDisabled()) {
+        return //...
+      }
+      //... toggle the child menu if already the menu item is active
+      if (this.state.isActive() && this.state.hasChildren()) {
+        this.state.reset()
+        return
+      }
+      this.state.setSelected()
+      this.$emit('menu:isActive')
+    },
+    toggleByChildItem() {
+      this.state.reset()
+      console.log(this.state)
+      this.$emit('menu:toggle')
+    },
+    async childSelected(child) {
+      if (this.state.isDisabled()) {
+        return //...
+      }
+      this.state.unselect()
+      child.setActiveChildItemState(child)
+      if (child.closeOnClick && !child.hasChildren()) {
+        this.toggleByChildItem()
+      }
+      if (typeof child.getCallback() === 'function') {
+        await child.getCallback()({
+          router: this.$router,
+          store: this.$store
+        })
+      }
     },
   },
   beforeMount() {
-    if (this.disable && this.isActive) {
+    if (this.state.isDisabled() && this.state.isActive()) {
       throw new Error(
-        `Error in component MenuItem with ${this.id}. disable and isActive props cannot be true at the same time`
+        `Error in component MenuItem with ${this.state.id}. disable and isActive props cannot be true at the same time`
       )
     }
+  },
+  unmounted() {
+    //... TODO - reset all the child states
+    this.state.reset()
   },
 }
 </script>

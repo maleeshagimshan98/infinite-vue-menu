@@ -16,11 +16,27 @@ class MenuState {
    * @param {Object} items - items (menu item names),
    * @param {Object} styles (menu-wide styling data)
    */
-  constructor(items, {item, text}= {}) {
+  constructor(items, { item, text } = {}) {
     this._isMenuActive = false
-    this._styles = new MenuStyles(item??null,text??null)
+    this._styles = new MenuStyles(item ?? null, text ?? null)
     this._activeItem
     this._items = this._initialize(items)
+  }
+
+  /**
+   * Initialize the styles for a particular menu item
+   * 
+   * @param {object} item 
+   * @returns {MenuStyles}
+   */
+  _initializeItemStyles (item) {
+    if (!item.hasOwnProperty('styles')) {
+      return this._styles
+    }
+    return new MenuStyles(
+      item.styles.item ?? null,
+      item.styles.text
+    )
   }
 
   /**
@@ -29,27 +45,29 @@ class MenuState {
    * @param {Object} items
    * @returns {Object}
    */
-  _initialize(items) {
+  _initialize(items, isChild = false) {
     let stateTree = {}
-    for (let item in items) {
-      if (!items[item].id) {
+    Object.entries(items).forEach(([key, item]) => {
+      if (!item.id) {
         throw new Error(
-          `Error in creating a MenuItemState. No id is passed for MenuItem with title named '${items[item].title}'`
+          `Error in creating a MenuItemState. No id is passed for MenuItem with title named '${item.title}'`
         )
       }
       let menuItem = new MenuItemState({
-        id: items[item].id,
-        title: items[item].title ?? "",
-        isActive: items[item].isActive ?? false,
-        callback: items[item].callback ?? null,
-        closeOnClick: items[item].closeOnClick ?? true,
-        styles: items[item].styles ?? this._styles,
+        id: item.id,
+        title: item.title ?? "",
+        isChild : isChild,
+        isActive: item.isActive ?? false,
+        disabled : item.disabled ?? false,
+        callback: item.callback ?? null,
+        closeOnClick: item.closeOnClick ?? true,
+        styles: this._initializeItemStyles(item),
       })
-      if (items[item].children) {
-        menuItem.setChildren(this._initialize(items[item].children))
+      if (item.children) {
+        menuItem.setChildren(this._initialize(item.children, true))
       }
       stateTree[menuItem.id] = menuItem
-    }
+    })
     return stateTree
   }
 
@@ -83,6 +101,9 @@ class MenuState {
    * @returns {void}
    */
   _iterateOverStates(callback) {
+    if (Object.keys(this._items).length <= 0) {
+      console.warn(`Trying to iterate over children of ${this._id} but the item has no children`)
+    }
     for (let item in this._items) {
       callback(this._items[item])
     }
@@ -96,9 +117,11 @@ class MenuState {
    */
   setActiveItemState(menuState) {
     this._activeItem = menuState
-    //... mark other items as inactive
+    //... mark rest of the items as inactive
     this._iterateOverStates((item) => {
-      item.reset()
+      if (item.id !== menuState.id) {
+        item.reset()
+      }
     })
   }
 
