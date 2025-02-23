@@ -4,7 +4,7 @@ describe('MenuStyles', () => {
   let menuStyles;
 
   beforeEach(() => {
-    menuStyles = new MenuStyles();
+    menuStyles = new MenuStyles({});
   });
 
   test('should initialize with default styles', () => {
@@ -17,12 +17,14 @@ describe('MenuStyles', () => {
     };
 
     expect(menuStyles.getStyles()).toEqual({
-      item: defaultStyles,
+      container: [''],
+      item: { ...defaultStyles, childrenContainer: [] },
       text: defaultStyles,
     });
   });
 
   test('should set styles correctly', () => {
+    const containerStyles = ['item-container'];
     const itemStyles = {
       base: ['item-base'],
       idle: ['item-idle'],
@@ -39,10 +41,11 @@ describe('MenuStyles', () => {
       children: ['text-children'],
     };
 
-    menuStyles.setStyles(itemStyles, textStyles);
+    menuStyles.setStyles(containerStyles, itemStyles, textStyles);
 
     expect(menuStyles.getStyles()).toEqual({
-      item: itemStyles,
+      container: containerStyles,
+      item: { ...itemStyles, childrenContainer: [] },
       text: textStyles,
     });
   });
@@ -61,12 +64,13 @@ describe('MenuStyles', () => {
       children: [],
     };
 
-    menuStyles.setStyles(itemStyles, null);
+    menuStyles.setStyles(null, itemStyles, null);
 
     expect(menuStyles.getStyles().item).toEqual({
       ...defaultStyles,
       base: ['item-base'],
       idle: ['item-idle'],
+      childrenContainer: [],
     });
 
     expect(menuStyles.getStyles().text).toEqual(defaultStyles);
@@ -79,7 +83,7 @@ describe('MenuStyles', () => {
       base: ['item-base'],
     };
 
-    menuStyles.setStyles(incompleteStyles, null);
+    menuStyles.setStyles(null, incompleteStyles, null);
 
     expect(warnSpy).toHaveBeenCalledWith(
       'Infinite-Vue-Menu : Warning - Cannot set the styles. Styles object does not have a property idle'
@@ -97,9 +101,12 @@ describe('MenuStyles', () => {
       children: ['children-style'],
     };
 
-    const assignedStyles = menuStyles._assignStyleValues(styles);
+    const assignedStyles = menuStyles._assignItemStyleValues(styles);
 
-    expect(assignedStyles).toEqual(styles);
+    expect(assignedStyles).toEqual({
+      ...styles,
+      childrenContainer: [],
+    });
   });
 
   test('should return default style object', () => {
@@ -114,8 +121,23 @@ describe('MenuStyles', () => {
     expect(menuStyles._getDefaultStyleObj()).toEqual(defaultStyles);
   });
 
-  test('should set default styles', () => {
-    menuStyles._setDefaultStyles();
+  test('should set default item styles', () => {
+    menuStyles._setDefaultItemStyles();
+
+    const defaultStyles = {
+      base: [],
+      idle: [],
+      active: [],
+      disable: [],
+      children: [],
+      childrenContainer: [],
+    };
+
+    expect(menuStyles.getStyles().item).toEqual(defaultStyles);
+  });
+
+  test('should set default text styles', () => {
+    menuStyles._setDefaultTextStyles();
 
     const defaultStyles = {
       base: [],
@@ -125,9 +147,6 @@ describe('MenuStyles', () => {
       children: [],
     };
 
-    expect(menuStyles.getStyles()).toEqual({
-      item: defaultStyles,
-      text: defaultStyles,
-    });
+    expect(menuStyles.getStyles().text).toEqual(defaultStyles);
   });
 });
