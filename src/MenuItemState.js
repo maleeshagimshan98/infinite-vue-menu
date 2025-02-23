@@ -1,18 +1,121 @@
 /**
  * © Maleesha Gimshan - 2023 - github.com/maleeshagimshan98
- * Menu item
+ * Menu item state
+ *
+ * This class represents the state of a menu item in a UI component. It includes properties
+ * to manage the item's identifier, title, selection status, active status, disabled status,
+ * callback function, child items, and styles. The class provides methods to get and set these
+ * properties, as well as methods to manage the state of child items and reset the state.
  */
 
 import MenuStyles from "./MenuStyles"
 
 class MenuItemState {
   /**
+   * Active child menu item state
+   *
+   * @type {MenuItemState}
+   * @private
+   */
+  _activeChildItem
+
+  /**
+   * Unique identifier for the menu item
+   *
+   * @type {String}
+   * @private
+   */
+  _id
+
+  /**
+   * Title of the menu item
+   *
+   * @type {String}
+   * @private
+   */
+  _title
+
+  /**
+   * Indicates if the menu item is a child of another menu item
+   *
+   * @type {Boolean}
+   * @private
+   */
+  _isChild
+
+  /**
+   * Indicates if the menu item is selected
+   *
+   * @type {Boolean}
+   * @private
+   */
+  _isSelected
+
+  /**
+   * Indicates if the menu item is active
+   *
+   * @type {Boolean}
+   * @private
+   */
+  _isActive
+
+  /**
+   * Indicates if the menu item is disabled
+   *
+   * @type {Boolean}
+   * @private
+   */
+  _disabled
+
+  /**
+   * Callback function for the menu item
+   *
+   * @type {Function}
+   * @private
+   */
+  _callback
+
+  /**
+   * Indicates if the menu should close when clicked on the menu item
+   *
+   * @type {Boolean}
+   * @private
+   */
+  _closeOnClick
+
+  /**
+   * Children of the menu item
+   *
+   * @type {Object}
+   * @private
+   */
+  _children = {}
+
+  /**
+   * Styles for the menu item
+   *
+   * @type {MenuStyles}
+   * @private
+   */
+  _styles
+
+  /**
    * constructor
    *
    * @param {Object}
    * @throws {Error}
    */
-  constructor({ id, title, isChild = false, isSelected = false, isActive = false, disabled = false, callback, closeOnClick = true, styles }) {
+  constructor({
+    id,
+    title,
+    isChild = false,
+    isSelected = false,
+    isActive = false,
+    disabled = false,
+    callback,
+    closeOnClick = true,
+    styles,
+  }) {
     if (!id) {
       throw new Error(`MenuItemState constructor requires an 'id' parameter, but it is missing.`)
     }
@@ -24,8 +127,12 @@ class MenuItemState {
         `MenuItemState constructor requires the callback to be a function but recieved ${callback}`
       )
     }
+    if (styles && styles instanceof MenuStyles == false) {
+      throw new Error(
+        `MenuItemState constructor requires the styles to be an instance of MenuStyles but recieved ${typeof styles}`
+      )
+    }
 
-    this._activeChildItem
     this._id = id
     this._title = title
     this._isChild = isChild
@@ -58,7 +165,7 @@ class MenuItemState {
 
   /**
    * Getter method for checking if the menu item is a child of a parent maenu item
-   * 
+   *
    * @returns {boolean}
    */
   isChild() {
@@ -76,23 +183,23 @@ class MenuItemState {
 
   /**
    * Getter method for retrieving the isSelected status.
-   * 
+   *
    * @returns {Boolean}
    */
-  isSelected () {
+  isSelected() {
     return this._isSelected
   }
 
   /**
-   * 
+   *
    */
-  unselect () {
+  unselect() {
     this._isSelected = false
   }
 
   /**
    * Getter method for retrieving the disabled status
-   * 
+   *
    * @returns {boolean}
    */
   isDisabled() {
@@ -101,10 +208,10 @@ class MenuItemState {
 
   /**
    * Set the disabled value to true
-   * 
+   *
    * @return {void}
    */
-  setDisabled () {
+  setDisabled() {
     this._disabled = true
   }
 
@@ -198,10 +305,10 @@ class MenuItemState {
 
   /**
    * Set the MenuItemState as selected and active
-   * 
+   *
    * @return {MenuItemState}
    */
-  setSelected () {
+  setSelected() {
     this._isSelected = true
     //... in case of child items are in active state, reset them
     this._iterateOverChildStates((item) => {
@@ -218,7 +325,10 @@ class MenuItemState {
    */
   _iterateOverChildStates(callback) {
     if (Object.keys(this._children).length <= 0) {
-      console.warn(`Warning:Infinite-Vue-Menu - Trying to iterate over children of ${this._id} but the item has no children`)
+      console.warn(
+        `Warning:Infinite-Vue-Menu - Trying to iterate over children of ${this._id} but the item has no children`
+      )
+      return
     }
     for (let item in this._children) {
       callback(this._children[item])
@@ -250,7 +360,7 @@ class MenuItemState {
     this._isActive = false
     this._isSelected = false
     if (this.hasChildren()) {
-      this._iterateOverChildStates(child => {
+      this._iterateOverChildStates((child) => {
         child.reset()
       })
     }

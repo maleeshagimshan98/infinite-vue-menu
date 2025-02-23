@@ -10,17 +10,64 @@ import MenuStyles from "./MenuStyles.js"
  * manages the all menu item's data, children, styles
  */
 class MenuState {
+
+  /**
+   * Indicates if the menu is active
+   *
+   * @type {Boolean}
+   * @private
+   */
+  _isMenuActive
+
+  /**
+   * Styles for the menu
+   *
+   * @type {MenuStyles}
+   * @private
+   */
+  _styles
+
+  /**
+   * Active menu item state
+   *
+   * @type {MenuItemState}
+   * @private
+   */
+  _activeItem
+
+  /**
+   * Menu items
+   *
+   * @type {Object}
+   * @private
+   */
+  _items
+
   /**
    * constructor
    *
    * @param {Object} items - items (menu item names),
    * @param {Object} styles (menu-wide styling data)
    */
-  constructor(items, { item, text } = {}) {
+  constructor(items, styles = {}) {
     this._isMenuActive = false
-    this._styles = new MenuStyles(item ?? null, text ?? null)
-    this._activeItem
-    this._items = this._initialize(items)
+    this._styles = this._setMenuStyles(styles)
+    this._items = this._initializeState(items)
+  }
+
+  /**
+   * Sets the DEFAULT menu style instance according to the given parameters
+   * 
+   * @param {MenuStyles | object} styles
+   * @returns {MenuStyles}
+   */
+  _setMenuStyles (styles) {
+    if (styles instanceof MenuStyles) {
+      return styles
+    }
+    else {
+      return new MenuStyles(styles)
+    }
   }
 
   /**
@@ -33,10 +80,12 @@ class MenuState {
     if (!item.hasOwnProperty('styles')) {
       return this._styles
     }
-    return new MenuStyles(
-      item.styles.item ?? null,
-      item.styles.text
-    )
+    if (!(item.styles instanceof MenuStyles)) {
+      throw new Error(
+        `Error in creating a MenuItemState. The styles should be an instance of MenuStyles`
+      )
+    }
+    return item.styles
   }
 
   /**
@@ -45,7 +94,7 @@ class MenuState {
    * @param {Object} items
    * @returns {Object}
    */
-  _initialize(items, isChild = false) {
+  _initializeState(items, isChild = false) {
     let stateTree = {}
     Object.entries(items).forEach(([key, item]) => {
       if (!item.id) {
@@ -59,16 +108,25 @@ class MenuState {
         isChild : isChild,
         isActive: item.isActive ?? false,
         disabled : item.disabled ?? false,
-        callback: item.callback ?? null,
+        callback: item.callback ?? this._getDefaultCallback(),
         closeOnClick: item.closeOnClick ?? true,
         styles: this._initializeItemStyles(item),
       })
       if (item.children) {
-        menuItem.setChildren(this._initialize(item.children, true))
+        menuItem.setChildren(this._initializeState(item.children, true))
       }
       stateTree[menuItem.id] = menuItem
     })
     return stateTree
+  }
+
+  /**
+   * Get the sdk default callback for a menu item
+   * 
+   * @returns {Function}
+   */
+  _getDefaultCallback () {
+    return () => {}
   }
 
   /**
@@ -102,7 +160,8 @@ class MenuState {
    */
   _iterateOverStates(callback) {
     if (Object.keys(this._items).length <= 0) {
-      console.warn(`Trying to iterate over children of ${this._id} but the item has no children`)
+      console.warn(`Trying to iterate over empty menu. This menu has no children`)
+      return
     }
     for (let item in this._items) {
       callback(this._items[item])

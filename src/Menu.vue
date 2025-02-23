@@ -1,19 +1,18 @@
-﻿/** 
+/** 
  * © Maleesha Gimshan - 2023 - github.com/maleeshagimshan98 
  * Menu component
  */
 
 <template>
-  <div class="inf-vue-menu" v-click-away="(event) => clickaway && state.isMenuActive() ? state.closeMenu() : null">
-    <slot name="activator"></slot>
+  <div class="inf-vue-menu" v-click-away="(event) => clickaway && _state.isMenuActive() ? _state.closeMenu() : null">
+    <slot name="activator" :state="_state"></slot>
     <!-- main content -->
     <!-- position absolute z-index-110 ? -->
-    <slot v-if="state.isMenuActive()">
-      <div class="inf-vue-menu-content">
+    <slot v-if="_state.isMenuActive()" :state="_state">
+      <div class="inf-vue-menu-content" v-bind:class="styles.getStyles().container">
         <!-- make scrollable, hide scroll bar -->
-        <MenuItem v-for="(item, name, index) in state.getMenuItems()" :activateOnHover="activateOnHover" :state="item"
-          @menu:isActive="id => activateItem(item)" @menu:toggle="toggleMenu()"
-          @menu:mouseover="activateOnMouseOver(item)">
+        <MenuItem v-for="(item, name, index) in _state.getMenuItems()" :state="item"
+          @menu:isActive="id => itemClicked(item)" @menu:toggle="toggleMenu()">
         </MenuItem>
       </div>
     </slot>
@@ -28,13 +27,13 @@ export default {
   name: "infinite-vue-menu",
   data: function () {
     return {
-      //state: null
+      _state: null
     }
   },
   props: {
-    closeOnClick: {
-      type: Boolean,
-      default: false
+    closeOnClick : {
+      type : Boolean,
+      default : false
     },
     clickaway: {
       type: Boolean,
@@ -44,34 +43,31 @@ export default {
       type: Boolean,
       default: false,
     },
-    activateOnHover: {
-      type: Boolean,
-      default: false
+    items: {
+      type: Object,
     },
-    state: {
-      type: MenuState,
-      required: true
+    styles: {
+      type: Object,
     },
   },
   methods: {
     toggleMenu() {
-      this.state.toggleMenu()
+      this._state.toggleMenu()
     },
-    async activateOnMouseOver(item) {
-      if (this.activateOnHover) {
-        this.state.setActiveItemState(item)
-      }
-    },   
-    async activateItem(item) {
+    async itemClicked(item) {
       //let item = this._state.getMenuItemsById(item)
-      //console.log(item)
-      this.state.setActiveItemState(item) //... mark other items as inactive
-      if (typeof item.getCallback() === 'function') {
-        await item.getCallback()()
-      }
+      console.log(item)
+      //... TODO - clashing with nested item logic
+      this._state.setActiveItemState(item) //... mark other items as inactive
       if (this.closeOnClick && !item.hasChildren()) {
         this.toggleMenu()
-      }      
+      }
+      if (typeof item.getCallback() === 'function') {
+        await item.getCallback()({
+          router : this.$router,
+          store : this.$store
+        })
+      }
     },
   },
   computed: {},
@@ -79,11 +75,11 @@ export default {
     MenuItem,
   },
   beforeMount() {
-    //this._state = new MenuState(this.items, this.styles)
+    this._state = new MenuState(this.items, this.styles)
   },
   mounted() {
     if (this.activated) {
-      this.state.toggleMenu()
+      this._state.toggleMenu()
     }
   },
 }

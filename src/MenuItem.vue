@@ -1,19 +1,17 @@
 /** * © Maleesha Gimshan - 2023 - github.com/maleeshagimshan98 * Menu item */
 
 <template>
-  <div class="" v-bind:class="itemStyles" :key="state.id" v-on:mouseover="activateOnMouseOver()"
-    v-on:click.stop="selected()">
+  <div class="" v-bind:class="itemStyles" :key="state.id" v-on:click.stop="selected()">
     <!-- menu item content -->
     <slot>
-      <p class="" v-bind:class="textStyles">
+      <p class="" v-bind:class="textStyles" style="margin: 0;">
         {{ state.title }}
       </p>
 
       <!-- children -->
-      <div style="display: flex; flex-direction : column;" v-if="state.isActive() && state.hasChildren()">
-        <infinite-vue-menu-item v-for="(child, name, index) in state.getChildren()" :activateOnHover="activateOnHover"
-          :state="child" :styles="child.getStyles()" @menu:isActive="childSelected(child)"
-          @menu:toggle="toggleByChildItem(child)" @mouseover.stop="activateChildOnMouseOver(child)">
+      <div class="children-container" v-bind:class="state.getStyles().container" v-if="state.isActive() && state.hasChildren()">
+        <infinite-vue-menu-item v-for="(child, name, index) in state.getChildren()" :state="child"
+          :styles="child.getStyles()" @menu:isActive="childSelected(child)" @menu:toggle="toggleByChildItem(child)">
         </infinite-vue-menu-item>
       </div>
     </slot>
@@ -29,31 +27,28 @@ export default {
   },
   computed: {
     itemStyles() {
-      let { item } = this.state.getStyles()
+      let {item} = this.state.getStyles()
       return {
-        [item.base.join(" ")]: true,
+        [item.base.join(" ")] : true,
         [item.idle.join(" ")]: !this.state.isSelected() && !this.state.isDisabled(),
         [item.active.join(" ")]: this.state.isSelected(),
         [item.disable.join(" ")]: this.state.isDisabled(),
-        [item.children.join(" ")]: this.state.isChild(),
+        [item.children.join(" ")] : this.state.isChild(),
       }
     },
     textStyles() {
-      let { text } = this.state.getStyles()
+      let {text} = this.state.getStyles()
+      
       return {
-        [text.base.join(" ")]: true,
+        [text.base.join(" ")] : true,
         [text.idle.join(" ")]: !this.state.isSelected() && !this.state.isDisabled(),
         [text.active.join(" ")]: this.state.isSelected(),
         [text.disable.join(" ")]: this.state.isDisabled(),
-        [text.children.join(" ")]: this.state.isChild(),
+        [text.children.join(" ")] : this.state.isChild(),
       }
     },
   },
   props: {
-    activateOnHover: {
-      type: Boolean,
-      default: false
-    },
     state: {
       type: Object,
       required: true
@@ -63,20 +58,6 @@ export default {
     },
   },
   methods: {
-    activateOnMouseOver() {
-      if (this.state.isDisabled() || !this.activateOnHover) {
-        return //...
-      }
-      this.state.setSelected()
-      this.$emit('menu:mouseover')
-    },
-    activateChildOnMouseOver(child) {
-      if (this.state.isDisabled()) {
-        return //...
-      }
-      this.state.unselect()
-      child.setActiveChildItemState(child)
-    },
     selected() {
       if (this.state.isDisabled()) {
         return //...
@@ -87,11 +68,11 @@ export default {
         return
       }
       this.state.setSelected()
-      this.$emit('menu:isActive')
+      this.$emit('menu:isActive', this.state.id)
     },
     toggleByChildItem() {
-      this.state.reset()
-      //console.log(this.state)
+      this.state.reset() 
+      console.log(this.state)
       this.$emit('menu:toggle')
     },
     async childSelected(child) {
@@ -104,7 +85,10 @@ export default {
         this.toggleByChildItem()
       }
       if (typeof child.getCallback() === 'function') {
-        await child.getCallback()()
+        await child.getCallback()({
+          router : this.$router,
+          store : this.$store
+        })
       }
     },
   },
@@ -121,3 +105,13 @@ export default {
   },
 }
 </script>
+
+<style>
+ .children-container {
+  display: flex;
+  flex-direction : column;
+  position: absolute;
+  left: 100%;
+  top: 0;
+ }
+</style>
