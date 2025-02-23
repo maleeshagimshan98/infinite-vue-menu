@@ -12,13 +12,15 @@
 import app from "../src/Menu.vue"
 import MenuStyles from "../src/MenuStyles";
 
-const styles = {
+const styles = new MenuStyles({
+    container : ['item-container'],
     item: {
         base: ['base-item'],
         idle: ['item-idle'],
         active: ['item-active'],
         disable: ['item-disable'],
         children: ['item-child'],
+        childrenWrapper : ['item-child-wrapper'],
     },
     text: {
         base: ['base-text'],
@@ -27,7 +29,7 @@ const styles = {
         disable: ['text-disable'],
         children: ['text-child'],
     }
-}
+})
 
 export default {
     data() {
@@ -36,6 +38,7 @@ export default {
                 id: 'home',
                 title: 'Home',
                 styles: new MenuStyles({
+                    container : [],
                     item: {
                         base: ['home-base'],
                         idle: ['home-item-idle'],
@@ -67,6 +70,15 @@ export default {
                             deepChild: {
                                 id: 'deepchild',
                                 title: 'Deep Child'
+                            },
+                            deepChild2: {
+                                id: 'deepchild2',
+                                title: 'Deep Child 2'
+                            },
+                            deepChild3: {
+                                id: 'deepchild3',
+                                title: 'Deep Child 3',
+                                closeOnClick : false
                             }
                         }
                     }
@@ -106,21 +118,34 @@ export default {
 }
 
 /* Base styles for menu items */
-.base-item {    
-    margin: 0px;
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
+.base-item {
+    padding: 15px 0px 15px 10px;    
+    border: none;
+    background-color: #fff;
     cursor: pointer;
     position: relative;
+    list-style: none;    
+    width: 200px;
+    transition: background-color 0.1s, color 0.1s, box-shadow 0.1s;
+    border-radius: 4px;    
+}
+
+.base-item:hover {
+    background-color: #f1f1f1;
 }
 
 .item-idle {
-    background-color: #f9f9f9;
+    background-color: #fff;
     color: #333;
 }
 
 .item-active {
-    background-color: #747679;
+    background-color: #6200ea;
+    color: #fff;
+}
+
+.item-active:hover {
+    background-color: #4a03ad;
     color: #fff;
 }
 
@@ -131,12 +156,16 @@ export default {
 }
 
 .item-child {
-    margin-left: 2px;
+    padding-left: 20px;
+}
+
+.item-container {
+    box-shadow: 0 0px 4px rgba(202, 202, 202, 0.534);
 }
 
 /* Base styles for menu text */
 .base-text {
-    padding: 2px 5px 2px 5px;
+    padding: 2px 5px;
     font-size: 14px;
     font-weight: normal;
 }
