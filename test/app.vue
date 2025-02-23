@@ -10,6 +10,7 @@
 
 <script>
 import app from "../src/Menu.vue"
+import MenuStyles from "../src/MenuStyles";
 
 const styles = {
     item: {
@@ -34,7 +35,7 @@ export default {
             home: {
                 id: 'home',
                 title: 'Home',
-                styles: {
+                styles: new MenuStyles({
                     item: {
                         base: ['home-base'],
                         //idle: ['home-item-idle'],
@@ -49,7 +50,7 @@ export default {
                         disable: ['home-text-disable'],
                         children: ['home-text-child'],
                     }
-                },
+                }),
             },
             profile: {
                 id: "profile",
