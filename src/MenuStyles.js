@@ -73,16 +73,16 @@ class MenuStyles {
    * @return {void}
    */
   _setDefaultItemStyles() {    
-    this._item = {...this._getDefaultStyleObj(), childrenContainer: []}
+    return {...this._getDefaultStyleObj(), childrenContainer: []}
   }
-  
+
   /**
    * Set default styles for the menu item text
    *
    * @return {void}
    */
   _setDefaultTextStyles() {
-    this._text = this._getDefaultStyleObj()
+    return this._getDefaultStyleObj()
   }
 
   /**
@@ -109,7 +109,7 @@ class MenuStyles {
    * @return {object}
    */
   _assignItemStyleValues (styles) {
-    let state = ['base','idle', 'active', 'disable', 'children',]
+    let state = ['base','idle', 'active', 'disable', 'children', 'childrenContainer']
     return this._setStyleValues(state, styles)
   }
   
