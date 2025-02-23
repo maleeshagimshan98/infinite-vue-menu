@@ -4,6 +4,14 @@
  */
 
 class MenuStyles {
+  
+  /**
+   * Styles for menu item container (Including parent container and children container)
+   * 
+   * @type {Object}
+   * @private
+   */
+  _container = []
 
     /**
    * Styles for the menu item
@@ -20,15 +28,15 @@ class MenuStyles {
      * @private
      */
     _text = {}
-    
+  
   /**
    * constructor
    *
    * @param {Object}
    * @returns {MenuStyles}
    */
-  constructor(item, text) {
-    this.setStyles(item, text)
+  constructor({container, item, text}) {
+    this.setStyles(container, item, text)
   }
 
   /**
@@ -38,6 +46,7 @@ class MenuStyles {
    */
   getStyles() {
     return {
+      container: this._container,
       item: this._item,
       text: this._text,
     }
@@ -63,40 +72,71 @@ class MenuStyles {
    *
    * @return {void}
    */
-  _setDefaultStyles() {    
-    this._item = this._getDefaultStyleObj()
+  _setDefaultItemStyles() {    
+    this._item = {...this._getDefaultStyleObj(), childrenContainer: []}
+  }
+  
+  /**
+   * Set default styles for the menu item text
+   *
+   * @return {void}
+   */
+  _setDefaultTextStyles() {
     this._text = this._getDefaultStyleObj()
   }
 
   /**
-   * Assign the style values to the style elements
    * 
-   * @param {Object} styles
-   * @return {void}
+   * @param {array} state 
+   * @param {object} styles
+   * @returns {object}
    */
-  _assignStyleValues (styles) {
+  _setStyleValues (state, styles) {
     let element = {}
-    let state = ['base','idle', 'active', 'disable', 'children']
     state.forEach (el => {
-        if (!styles.hasOwnProperty(el)) {
-          console.warn(`Infinite-Vue-Menu : Warning - Cannot set the styles. Styles object does not have a property ${el}`)
-        }
-        element[el] = styles[el] ?? []
+      if (!styles.hasOwnProperty(el)) {
+        console.warn(`Infinite-Vue-Menu : Warning - Cannot set the styles. Styles object does not have a property ${el}`)
+      }
+      element[el] = styles[el] ?? []
     })
     return element
+  }
+
+  /**
+   * Assign the style values to the menu items
+   * 
+   * @param {Object} styles
+   * @return {object}
+   */
+  _assignItemStyleValues (styles) {
+    let state = ['base','idle', 'active', 'disable', 'children',]
+    return this._setStyleValues(state, styles)
+  }
+  
+  /**
+   * Assign the style values to the menu item texts
+   * 
+   * @param {Object} styles
+   * @return {object}
+   */
+  _assignItemTextStyleValues (styles) {
+    let state = ['base','idle', 'active', 'disable', 'children']
+    return this._setStyleValues(state, styles)
   }
 
   /**
    * set styles,
    * if any of property is not set, set it to default
    *
+   * @param {object} container
    * @param {object} item
    * @param {object} text
-   * @returns {object}
+   * @returns {void}
    */
-  setStyles(item, text) {
-    this._item = item ? this._assignStyleValues(item) : this._getDefaultStyleObj()
-    this._text = text ? this._assignStyleValues(text) : this._getDefaultStyleObj()
+  setStyles(container, item, text) {
+    this._container = container ? container : ['']
+    this._item = item ? this._assignItemStyleValues(item) : this._setDefaultItemStyles()
+    this._text = text ? this._assignItemTextStyleValues(text) : this._setDefaultTextStyles()
   }
 }
 

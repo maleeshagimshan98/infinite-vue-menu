@@ -9,7 +9,7 @@
     <!-- main content -->
     <!-- position absolute z-index-110 ? -->
     <slot v-if="_state.isMenuActive()" :state="_state">
-      <div class="inf-vue-menu-content">
+      <div class="inf-vue-menu-content" v-bind:class="styles.getStyles().container">
         <!-- make scrollable, hide scroll bar -->
         <MenuItem v-for="(item, name, index) in _state.getMenuItems()" :state="item"
           @menu:isActive="id => itemClicked(item)" @menu:toggle="toggleMenu()">

@@ -49,14 +49,14 @@ class MenuState {
    * @param {Object} items - items (menu item names),
    * @param {Object} styles (menu-wide styling data)
    */
-  constructor(items, { item, text } = {}) {
+  constructor(items, styles = {}) {
     this._isMenuActive = false
-    this._styles = this._setMenuStyles({item, text})
+    this._styles = this._setMenuStyles(styles)
     this._items = this._initializeState(items)
   }
 
   /**
-   * Sets the menu style instance according to the given parameters
+   * Sets the DEFAULT menu style instance according to the given parameters
    * 
    * @param {MenuStyles | object} styles
    * @returns {MenuStyles}
@@ -66,7 +66,7 @@ class MenuState {
       return styles
     }
     else {
-      return new MenuStyles(styles.item, styles.text)
+      return new MenuStyles(styles)
     }
   }
 

@@ -4,12 +4,12 @@
   <div class="" v-bind:class="itemStyles" :key="state.id" v-on:click.stop="selected()">
     <!-- menu item content -->
     <slot>
-      <p class="" v-bind:class="textStyles">
+      <p class="" v-bind:class="textStyles" style="margin: 0;">
         {{ state.title }}
       </p>
 
       <!-- children -->
-      <div class="children-container" v-if="state.isActive() && state.hasChildren()">
+      <div class="children-container" v-bind:class="state.getStyles().container" v-if="state.isActive() && state.hasChildren()">
         <infinite-vue-menu-item v-for="(child, name, index) in state.getChildren()" :state="child"
           :styles="child.getStyles()" @menu:isActive="childSelected(child)" @menu:toggle="toggleByChildItem(child)">
         </infinite-vue-menu-item>
@@ -38,6 +38,7 @@ export default {
     },
     textStyles() {
       let {text} = this.state.getStyles()
+      
       return {
         [text.base.join(" ")] : true,
         [text.idle.join(" ")]: !this.state.isSelected() && !this.state.isDisabled(),
