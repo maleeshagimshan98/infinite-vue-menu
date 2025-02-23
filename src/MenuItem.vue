@@ -9,7 +9,7 @@
       </p>
 
       <!-- children -->
-      <div style="display: flex; flex-direction : column;" v-if="state.isActive() && state.hasChildren()">
+      <div class="children-container" v-if="state.isActive() && state.hasChildren()">
         <infinite-vue-menu-item v-for="(child, name, index) in state.getChildren()" :state="child"
           :styles="child.getStyles()" @menu:isActive="childSelected(child)" @menu:toggle="toggleByChildItem(child)">
         </infinite-vue-menu-item>
@@ -104,3 +104,13 @@ export default {
   },
 }
 </script>
+
+<style>
+ .children-container {
+  display: flex;
+  flex-direction : column;
+  position: absolute;
+  left: 100%;
+  top: 0;
+ }
+</style>
