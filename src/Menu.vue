@@ -1,4 +1,4 @@
-﻿/** 
+/** 
  * © Maleesha Gimshan - 2023 - github.com/maleeshagimshan98 
  * Menu component
  */
